@@ -1,6 +1,7 @@
 package ws.munday.barcamptampa;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -95,8 +96,8 @@ public class ScheduleItemActivity extends Activity {
 				i.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
 				i.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
 				i.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
-				i.startTime = c.getString(BarcampTampaContentProvider.START_TIME_COLUMN);
-				i.endTime = c.getString(BarcampTampaContentProvider.END_TIME_COLUMN);
+				i.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
+				i.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
 				i.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
 				i.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
 				i.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);
@@ -202,8 +203,8 @@ public class ScheduleItemActivity extends Activity {
 						itm.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
 						itm.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
 						itm.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
-						itm.startTime = c.getString(BarcampTampaContentProvider.START_TIME_COLUMN);
-						itm.endTime = c.getString(BarcampTampaContentProvider.END_TIME_COLUMN);
+						itm.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
+						itm.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
 						itm.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
 						itm.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
 						itm.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);

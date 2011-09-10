@@ -1,5 +1,6 @@
 package ws.munday.barcamptampa;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
@@ -106,7 +107,8 @@ public class ScheduleItemAdapter extends BaseAdapter{
 		}
 
 		// Bind the data efficiently with the holder.
-		holder.time.setText(s.startTime);
+		SimpleDateFormat f = new SimpleDateFormat("h:mm a");
+		holder.time.setText(f.format(s.startTime));
 		holder.room.setText(s.roomName);
 		holder.title.setText(s.title);
 		holder.star.setChecked(s.isStarred);

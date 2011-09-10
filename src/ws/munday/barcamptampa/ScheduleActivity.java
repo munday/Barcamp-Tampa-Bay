@@ -2,12 +2,12 @@ package ws.munday.barcamptampa;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import ws.munday.barcamptampa.R.anim;
 import ws.munday.barcamptampa.R.id;
 import ws.munday.barcamptampa.R.layout;
-import ws.munday.barcamptampa.StarredScheduleActivity.syncTask;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -25,7 +25,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class ScheduleActivity extends Activity implements StarCheckListener {
 
@@ -55,35 +54,6 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 			@Override
 			public void onClick(View v) {
 				new syncTask().execute();
-				/*handler.post(new Runnable() {
-					
-					@Override
-					public void run() {
-						final ImageView refresh = (ImageView) findViewById(id.refresh);
-						
-						refresh.startAnimation(refreshAnim);
-						try{
-							dbSyncer.syncData();
-						}catch (Exception e) {
-							Toast.makeText(getApplicationContext(),"Unable to sync data, check your internet connection.", Toast.LENGTH_LONG).show();
-						}
-						
-						ListView l = (ListView)findViewById(id.scheduleitems);
-						items = new ScheduleItemAdapter(getItems(), ScheduleActivity.this, getApplicationContext());
-						l.setAdapter(items);
-						
-							handler.postDelayed(new Runnable() {
-								@Override
-								public void run() {
-									refresh.clearAnimation();
-								}
-							}, 600); 
-						
-						
-					}
-				});*/
-				
-				
 			}
 		});
 		
@@ -144,8 +114,8 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 				i.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
 				i.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
 				i.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
-				i.startTime = c.getString(BarcampTampaContentProvider.START_TIME_COLUMN);
-				i.endTime = c.getString(BarcampTampaContentProvider.END_TIME_COLUMN);
+				i.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
+				i.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
 				i.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
 				i.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
 				i.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);
@@ -157,17 +127,7 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 			}
 		}
 		
-		TextView t = (TextView)findViewById(id.noitems);
-		ListView l = (ListView)findViewById(id.scheduleitems);
 		
-		if(itms.isEmpty()){
-			l.setVisibility(View.GONE);
-			t.setText("The schedule will be available on September 24th, the day of the event. \nAs presentations are added to the schedule they will appear here.");
-			t.setVisibility(View.VISIBLE);
-		}else{
-			l.setVisibility(View.VISIBLE);
-			t.setVisibility(View.GONE);
-		}
 		Collections.sort(itms, new TimeComparer());
 		return itms;
 	}

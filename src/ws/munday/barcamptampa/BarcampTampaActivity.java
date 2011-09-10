@@ -124,7 +124,7 @@ public class BarcampTampaActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent();
-				i.setClass(getApplicationContext(), StarredScheduleActivity.class);
+				i.setClass(getApplicationContext(), UpcomingScheduleActivity.class);
 				startActivity(i);
 			}
 		});
@@ -316,6 +316,7 @@ public class BarcampTampaActivity extends Activity {
  				Log.d("bctb","syncing");
  				dbSyncer.syncData();
 			}catch (Exception e) {
+				e.printStackTrace();
 				runOnUiThread(new Runnable() {
 					
 					@Override

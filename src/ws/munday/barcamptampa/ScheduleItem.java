@@ -1,13 +1,14 @@
 package ws.munday.barcamptampa;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ScheduleItem {
 
 	public long id;
 	public String sheetId;
-	public String startTime;
-	public String endTime;
+	public Date startTime;
+	public Date endTime;
 	public String title;
 	public String description;
 	public String speaker;

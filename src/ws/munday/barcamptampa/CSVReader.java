@@ -2,7 +2,11 @@ package ws.munday.barcamptampa;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+
 import org.apache.http.client.ClientProtocolException;
+
+import android.util.Log;
 
 
 public class CSVReader {
@@ -20,8 +24,9 @@ public class CSVReader {
 			String[] data = lines[x].split("\\t");
 			ScheduleItem i = new ScheduleItem();
 			i.sheetId = data[0];
-			i.startTime = data[1];
-			i.endTime = data[2];
+			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + data[1]);
+			Log.d("bctb", i.startTime.toString());
+			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + data[2]);
 			i.roomName = data[3];
 			i.title = data[4];
 			i.description = data[5];

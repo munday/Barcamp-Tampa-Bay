@@ -2,6 +2,7 @@ package ws.munday.barcamptampa;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import ws.munday.barcamptampa.R.anim;
@@ -115,8 +116,8 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 				i.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
 				i.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
 				i.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
-				i.startTime = c.getString(BarcampTampaContentProvider.START_TIME_COLUMN);
-				i.endTime = c.getString(BarcampTampaContentProvider.END_TIME_COLUMN);
+				i.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
+				i.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
 				i.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
 				i.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
 				i.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);

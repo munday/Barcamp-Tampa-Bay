@@ -1,9 +1,6 @@
 package ws.munday.barcamptampa;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 
 public class TimeComparer implements Comparator<ScheduleItem> {
 
@@ -11,21 +8,10 @@ public class TimeComparer implements Comparator<ScheduleItem> {
 	public int compare(ScheduleItem item1, ScheduleItem item2) {
 		
 		
-		SimpleDateFormat f = new SimpleDateFormat("hh:mm a");
-		
-		Date d1 = new Date();
-		Date d2 = new Date();
-		try {
-			d1 = f.parse(item1.startTime);
-			d2 = f.parse(item2.startTime);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		
 			
-		if(d1.after(d2)){
+		if(item1.startTime.after(item2.startTime)){
 			return 1;
-		}else if(d2.after(d1)){
+		}else if(item2.startTime.after(item1.startTime)){
 			return -1;
 		}else{
 			return 0;

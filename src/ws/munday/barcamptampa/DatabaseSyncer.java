@@ -1,17 +1,19 @@
 package ws.munday.barcamptampa;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import org.apache.http.client.ClientProtocolException;
 
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DatabaseSyncer {
 
+	public static String CONFERENCE_DATE_WITHOUT_TIME = "9/24/2011 ";
 	private SQLiteDatabase db;
 	private barcampDbHelper dbHelper;
 	private Context context;
@@ -40,9 +42,11 @@ public class DatabaseSyncer {
 	
 	private void upsertScheduleItem(ScheduleItem i){
 		ContentValues v = new ContentValues();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Log.d("bctb",f.format(i.startTime));
 		v.put(BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID, Integer.parseInt(i.sheetId));
-		v.put(BarcampTampaContentProvider.START_TIME, i.startTime);
-		v.put(BarcampTampaContentProvider.END_TIME, i.endTime);
+		v.put(BarcampTampaContentProvider.START_TIME, i.startTime.getTime());
+		v.put(BarcampTampaContentProvider.END_TIME, i.endTime.getTime());
 		v.put(BarcampTampaContentProvider.ROOM_NAME, i.roomName);
 		v.put(BarcampTampaContentProvider.TITLE, i.title);
 		v.put(BarcampTampaContentProvider.DESCRIPTION, i.description);
