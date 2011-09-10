@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg"
+    >
+   
+		<RelativeLayout 
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_gravity="top"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:layout_marginTop="10dp">
+			
+			<ImageView 
+				android:id="@+id/refresh"
+				android:layout_width="wrap_content"
+				android:layout_height="40dp"
+				android:layout_marginTop="5dp"
+				android:layout_marginBottom="5dp"
+				android:src="@drawable/reload"
+				android:layout_alignParentRight="true"/>
+			
+			<ImageView 
+				android:id="@+id/logo"
+				android:src="@drawable/barcamptampalogo"
+			 	android:layout_width="fill_parent"
+			 	android:layout_height="50dip"
+			 	android:scaleType="fitStart"
+			 	android:layout_alignParentTop="true"
+			/>
+			
+			<TextView 
+				android:id="@+id/title"
+				android:layout_marginLeft="60dp"
+				android:layout_marginTop="-10dp"
+				android:textSize="20dp"
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/logo"
+				android:text="Conference Schedule"
+				android:gravity="left"
+				android:textColor="#6eb5f9"
+				/>
+				
+			<TextView
+				android:id="@+id/header_divider"
+				android:layout_width="fill_parent"
+				android:layout_height="1dp"
+				android:layout_marginTop="10dp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="10dp"
+				android:layout_below="@+id/title"
+				android:fadingEdge="vertical"
+				android:background="#eed5d5d5"
+				android:visibility="gone"/>
+					
+			<ListView 
+				android:id="@+id/scheduleitems"
+				android:listSelector="@drawable/selector"
+				android:layout_width="fill_parent" 
+				android:layout_height="fill_parent"
+				android:layout_alignParentBottom="true"
+				android:layout_below="@+id/header_divider"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="10dp"
+				android:layout_marginBottom="25dp"
+				android:layout_marginTop="0dp"
+				android:fadingEdge="vertical"
+				android:divider="#eed5d5d5"
+				android:dividerHeight="1dp"
+				android:drawingCacheQuality="high"
+				android:cacheColorHint="@android:color/transparent"
+			/>
+			
+			<TextView 
+				android:id="@+id/noitems"
+				android:gravity="center"
+				android:layout_margin="10dp"
+				android:textSize="18dp"
+				android:visibility="gone"
+				android:layout_width="fill_parent" 
+				android:layout_height="fill_parent"
+				android:layout_alignParentBottom="true"
+				android:layout_below="@+id/logo"
+				android:text="Nothing Here"
+				/>
+			
+		</RelativeLayout>
+		
+	
+</LinearLayout>

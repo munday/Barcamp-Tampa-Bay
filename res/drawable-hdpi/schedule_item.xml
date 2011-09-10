@@ -1,0 +1,13 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <padding android:left="2dp"
+                android:top="2dp"
+                android:right="2dp"
+                android:bottom="2dp"/>
+            <gradient android:startColor="#fff7f7f7"
+                android:endColor="#ffffffff"
+                android:angle="90"/>
+        </shape>
+    </item>
+</layer-list>

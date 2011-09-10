@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources> 
+	<style name="Theme" parent="android:Theme">
+		<item name="android:screenOrientation">sensor</item>
+		<item name="android:windowBackground">@null</item>
+		<item name="android:windowFrame">@null</item> 
+		<item name="android:windowContentOverlay">@null</item> 
+		<item name="android:windowIsFloating">false</item> 
+		<item name="android:windowFullscreen">false</item> 
+		<item name="android:backgroundDimEnabled">false</item> 
+		<item name="android:windowIsTranslucent">false</item>
+		<item name="android:windowNoTitle">true</item> 
+	</style> 
+ 	
+ 	<style name="Theme.Main" parent="Theme"> 
+ 		<item name="android:windowBackground">@drawable/mainbg</item>
+		<item name="android:windowFrame">@null</item> 
+		<item name="android:windowFullscreen">false</item> 
+		<item name="android:windowContentOverlay">@null</item> 
+		<item name="android:windowIsFloating">false</item> 
+		<item name="android:backgroundDimEnabled">false</item> 
+		<item name="android:windowIsTranslucent">false</item>
+		<item name="android:windowNoTitle">true</item> 
+ 		<item name="android:windowAnimationStyle">@android:style/Animation.Activity</item> 
+ 		<item name="android:windowSoftInputMode">stateUnspecified|adjustUnspecified</item>
+ 		<item name="android:textColorPrimary">#999999</item>
+        <item name="android:textColorSecondary">#aaaaaa</item>
+        <item name="android:textColorTertiary">#bbbbbb</item>
+        <item name="android:textColorPrimaryInverse">#555555</item>
+        <item name="android:textColorSecondaryInverse">#333333</item>
+        <item name="android:textColorTertiaryInverse">#000000</item>
+        <item name="android:textColorHint">#eeeeee</item>
+        <item name="android:textColorHintInverse">#222222</item>
+
+ 	
+ 	</style>
+ 	
+	 <color name="semi_trans_black_dark">#aa000000</color>
+	 <color name="semi_trans_black_light">#55000000</color>
+	 <color name="semi_trans_grey_dark">#aa999999</color>
+	 <color name="grey">#ffa0a0a0</color>
+	 <color name="white">#ffffffff</color>
+	 <color name="blue">#ff3333ff</color>
+	 	
+ </resources> 
