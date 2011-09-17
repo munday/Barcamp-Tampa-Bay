@@ -17,6 +17,7 @@ public class ScheduleItem {
 	public String slidesUrl;
 	public String roomName;
 	public boolean isStarred;
+	
 	public ArrayList<ScheduleItem> conflictingItems = new ArrayList<ScheduleItem>();
 
 	public String toString(){

@@ -217,6 +217,8 @@ public class ScheduleItemActivity extends Activity {
 							i.conflictingItems.add(itm);
 						}
 				}
+
+				c.close();
 			}
 			
 		}

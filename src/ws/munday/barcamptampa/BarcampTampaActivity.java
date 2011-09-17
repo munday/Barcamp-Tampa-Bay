@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import ws.munday.barcamptampa.R.id;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,12 +22,15 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -45,10 +50,16 @@ public class BarcampTampaActivity extends Activity {
         
         setContentView(R.layout.main);
        
-        buildHomeIcons();
+        Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         
-        createButtonGrid(R.id.main_menu, homeIcons);
-        
+        if(display.getOrientation()==1){
+        	buildHomeIcons(5);
+        	createButtonGrid(R.id.main_menu,10, homeIcons);
+        }else{
+    		buildHomeIcons(10);
+    		createButtonGrid(R.id.main_menu,40, homeIcons);	
+        }
+    	
         Runnable tweetrefresher = new Runnable() {
 			
 			@Override
@@ -81,86 +92,52 @@ public class BarcampTampaActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
     	
-    	buildHomeIcons();
-    	createButtonGrid(R.id.main_menu, homeIcons);
-      
+    	
+    	/*
+    	TextView tweetHead=(TextView) findViewById(id.tweets_head);
+		LinearLayout tweets = (LinearLayout) findViewById(id.tweets);
+		ImageView logo = (ImageView) findViewById(id.logo);
+		*/
+    	if (newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+    		buildHomeIcons(5);
+    		createButtonGrid(R.id.main_menu,10, homeIcons);
+        	/*
+    		logo.setScaleType(ScaleType.FIT_START);
+    		tweetHead.setVisibility(View.GONE);
+    		tweets.setVisibility(View.GONE);
+    		*/
+    	}else{
+    		buildHomeIcons(10);
+    		createButtonGrid(R.id.main_menu,40, homeIcons);
+        	/*
+    		logo.setScaleType(ScaleType.FIT_CENTER);
+    		tweetHead.setVisibility(View.VISIBLE);
+    		tweets.setVisibility(View.VISIBLE);
+    		*/
+    	}
     	
     	super.onConfigurationChanged(newConfig);
     }
 
-    public void buildHomeIcons(){
+    public void buildHomeIcons(int padding){
     	
     	homeIcons = new ArrayList<View>();
-    	
-    	LinearLayout l = new LinearLayout(this);
-        l.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        homeIcons.add(makeIcon(R.drawable.schedule, padding, ScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.starred, padding, StarredScheduleActivity.class));
+        
+        homeIcons.add(makeIcon(R.drawable.schedule, padding, UpcomingScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.starred, padding, StarredUpcomingScheduleActivity.class));
+        
+        homeIcons.add(makeIcon(R.drawable.sponsors, padding, SponsorsActivity.class));
+
+        /*
+        LinearLayout l = new LinearLayout(this);
+        l.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         l.setGravity(Gravity.CENTER);
-        l.setPadding(10, 10, 10, 10);
+        l.setPadding(padding, padding, padding, padding);
         ImageView img = new ImageView(this);
-        img.setBackgroundDrawable(getResources().getDrawable(R.drawable.schedule));
+        img.setBackgroundDrawable(getResources().getDrawable(R.drawable.location));
         img.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent();
-				i.setClass(getApplicationContext(), ScheduleActivity.class);
-				startActivity(i);
-			}
-		});
-        
-        l.addView(img);
-        
-        homeIcons.add(l);
-        
-        LinearLayout l2 = new LinearLayout(this);
-        l2.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        l2.setGravity(Gravity.CENTER);
-        l2.setPadding(10, 10, 10, 10);
-        ImageView img2 = new ImageView(this);
-        img2.setBackgroundDrawable(getResources().getDrawable(R.drawable.starred));
-        
-        img2.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent();
-				i.setClass(getApplicationContext(), UpcomingScheduleActivity.class);
-				startActivity(i);
-			}
-		});
-        
-        l2.addView(img2);
-        
-        homeIcons.add(l2);
-        
-        LinearLayout l3 = new LinearLayout(this);
-        l3.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        l3.setGravity(Gravity.CENTER);
-        l3.setPadding(10, 10, 10, 10);
-        ImageView img3 = new ImageView(this);
-        img3.setBackgroundDrawable(getResources().getDrawable(R.drawable.sponsors));
-        
-        img3.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent();
-				i.setClass(getApplicationContext(), SponsorsActivity.class);
-				startActivity(i);
-			}
-		});
-        
-        l3.addView(img3);
-        
-        homeIcons.add(l3);
-        
-        LinearLayout l4 = new LinearLayout(this);
-        l4.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        l4.setGravity(Gravity.CENTER);
-        l4.setPadding(10, 10, 10, 10);
-        ImageView img4 = new ImageView(this);
-        img4.setBackgroundDrawable(getResources().getDrawable(R.drawable.location));
-        img4.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -169,28 +146,37 @@ public class BarcampTampaActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-        l4.addView(img4);
-        
-        homeIcons.add(l4);
-        /*
-        
-        LinearLayout l6 = new LinearLayout(this);
-        l6.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        l6.setGravity(Gravity.CENTER);
-        l6.setPadding(10, 10, 10, 10);
-        ImageView img6 = new ImageView(this);
-        img6.setBackgroundDrawable(getResources().getDrawable(R.drawable.tweets));
-        l6.addView(img6);
-        
-        homeIcons.add(l6);
-    	*/
+        l.addView(img);
+        homeIcons.add(l);
+        */
     }
     
-    private void createButtonGrid(int tableId, ArrayList<View> items ) {
+    private LinearLayout makeIcon(int drawable, int padding, final Class<?> c){
+    	LinearLayout l = new LinearLayout(this);
+        l.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        l.setGravity(Gravity.CENTER);
+        l.setPadding(padding, padding, padding, padding);
+        ImageView img = new ImageView(this);
+        img.setBackgroundDrawable(getResources().getDrawable(drawable));
+        img.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent();
+				i.setClass(getApplicationContext(), c);
+				startActivity(i);
+			}
+		});
+        
+        l.addView(img);
+        return l;
+    }
+    
+    private void createButtonGrid(int tableId, int padding, ArrayList<View> items ) {
     	
     	int viewWidth = this.getResources().getDisplayMetrics().widthPixels;
     	
-    	int buttonWidth = getResources().getDrawable(R.drawable.icon).getIntrinsicWidth() + 40;
+    	int buttonWidth = getResources().getDrawable(R.drawable.icon).getIntrinsicWidth() + padding;
     	        
         TableLayout grid = (TableLayout) findViewById(tableId);
  
@@ -317,14 +303,7 @@ public class BarcampTampaActivity extends Activity {
  				dbSyncer.syncData();
 			}catch (Exception e) {
 				e.printStackTrace();
-				runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						Toast.makeText(getApplicationContext(),"Unable to sync data, check your internet connection.", Toast.LENGTH_LONG).show();			
-					}
-				});
+
 			}
 			return null;
  			

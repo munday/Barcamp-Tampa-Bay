@@ -1,8 +1,11 @@
 package ws.munday.barcamptampa;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+
+import org.apache.http.client.ClientProtocolException;
 
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import ws.munday.barcamptampa.R.anim;
@@ -25,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class ScheduleActivity extends Activity implements StarCheckListener {
 
@@ -44,10 +48,8 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
         refreshAnim = AnimationUtils.loadAnimation(getApplicationContext(),anim.rotate);
         
         handler = new Handler();
-        dbSyncer = new DatabaseSyncer(getApplicationContext());		
-        dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
-		db = dbHelper.getWritableDatabase();
-	
+        TextView t = (TextView)findViewById(id.noitems);
+		t.setText("Barcamp Tampa Starts on September 24th. The schedule will appear here as it is created.");
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
 			
@@ -63,8 +65,12 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 	
 	@Override
 	protected void onStart() {
+		dbSyncer = new DatabaseSyncer(getApplicationContext());		
+        dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
+		db = dbHelper.getWritableDatabase();
+	
 		ListView l = (ListView)findViewById(id.scheduleitems);
-		new syncTask().execute();
+		new loadTask().execute();
 		l.setOnItemClickListener( new OnItemClickListener() {
 
 			@Override
@@ -78,17 +84,21 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 			}
 			
 		});
+		ImageView refresh = (ImageView) findViewById(id.refresh);
+		refresh.startAnimation(refreshAnim);
 		
 		super.onStart();
 	}
 	
 	@Override
-	protected void onDestroy() {
+	protected void onStop() {
 		dbSyncer.close();
 		db.close();
 		dbHelper.close();
-		super.onDestroy();
+		super.onStop();
 	}
+	
+
 	
 	private ArrayList<ScheduleItem> getItems(){
 		ArrayList<ScheduleItem> itms = new ArrayList<ScheduleItem>();
@@ -125,6 +135,7 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
 				itms.add(i);
 			}
+			c.close();
 		}
 		
 		
@@ -156,22 +167,39 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 				
 				@Override
 				public void run() {
-					refresh.startAnimation(refreshAnim);
+					if(refresh.getAnimation()==null)
+						refresh.startAnimation(refreshAnim);
 				}
 			});
+ 			
+ 			try {
+				dbSyncer.syncData();
+			} catch (ClientProtocolException e) {
+			} catch (IOException e) {
+			}
+ 			
  			return getItems();
  		}
      	
  		public void onPostExecute(ArrayList<ScheduleItem> result) {
  			Log.d("bctb","sync done");
- 				if(items==null){
- 					items = new ScheduleItemAdapter(result, ScheduleActivity.this, getApplicationContext());
- 					ListView l = (ListView)findViewById(id.scheduleitems);
- 					l.setAdapter(items);
- 				}else{
- 					items.setItems(result);
- 					items.notifyDataSetChanged();
- 				}
+ 			ListView l = (ListView)findViewById(id.scheduleitems);
+   			TextView t = (TextView)findViewById(id.noitems);
+   			if(result.isEmpty()){
+				l.setVisibility(View.GONE);
+				t.setVisibility(View.VISIBLE);
+			}else{
+				l.setVisibility(View.VISIBLE);
+				t.setVisibility(View.GONE);
+			}
+   			
+ 			if(items==null){
+				items = new ScheduleItemAdapter(result, ScheduleActivity.this, getApplicationContext());
+				l.setAdapter(items);
+			}else{
+				items.setItems(result);
+				items.notifyDataSetChanged();
+			}
  			
 				handler.postDelayed(new Runnable() {
 					@Override
@@ -185,4 +213,55 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
  		
      };
 	
+     class loadTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
+
+ 		final ImageView refresh = (ImageView) findViewById(id.refresh);
+ 		
+  		@Override
+  		public ArrayList<ScheduleItem> doInBackground(Void... params) {
+  			runOnUiThread(new Runnable() {
+ 				
+ 				@Override
+ 				public void run() {
+ 					if(refresh.getAnimation()==null)
+ 						refresh.startAnimation(refreshAnim);
+ 				}
+ 			});
+  			
+  			return getItems();
+  		}
+      	
+  		public void onPostExecute(ArrayList<ScheduleItem> result) {
+  			Log.d("bctb","load done");
+  			ListView l = (ListView)findViewById(id.scheduleitems);
+   			TextView t = (TextView)findViewById(id.noitems);
+   			if(result.isEmpty()){
+				l.setVisibility(View.GONE);
+				t.setVisibility(View.VISIBLE);
+			}else{
+				l.setVisibility(View.VISIBLE);
+				t.setVisibility(View.GONE);
+			}	
+			
+   			if(items==null){
+				items = new ScheduleItemAdapter(result, ScheduleActivity.this, getApplicationContext());
+				l.setAdapter(items);
+			}else{
+				items.setItems(result);
+				items.notifyDataSetChanged();
+			}
+  			
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					refresh.clearAnimation();
+				}
+			}, 600); 
+ 			
+ 			
+ 		}
+  		
+      };
+ 	
+     
 }

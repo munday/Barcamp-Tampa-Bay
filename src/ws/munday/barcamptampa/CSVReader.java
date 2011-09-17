@@ -22,18 +22,19 @@ public class CSVReader {
 		String[] lines = csv.split("\n");
 		for(int x=1; x<lines.length;x++){
 			String[] data = lines[x].split("\\t");
+			
 			ScheduleItem i = new ScheduleItem();
-			i.sheetId = data[0];
-			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + data[1]);
+			i.sheetId = getData(data,0);
+			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,1));
 			Log.d("bctb", i.startTime.toString());
-			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + data[2]);
-			i.roomName = data[3];
-			i.title = data[4];
-			i.description = data[5];
-			i.speaker = data[6];
-			i.speakerTwitter = data[7];
-			i.speakerWebsite = data[8];
-			i.slidesUrl = data[9];
+			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,2));
+			i.roomName = getData(data,3);
+			i.title = getData(data,4);
+			i.description = getData(data,5);
+			i.speaker = getData(data,6);
+			i.speakerTwitter = getData(data,7);
+			i.speakerWebsite = getData(data,8);
+			i.slidesUrl = getData(data,9);
 			
 			items.add(i);
 			
@@ -41,6 +42,15 @@ public class CSVReader {
 		
 		return items;
 	}
+	
+	public static String getData(String[] data, int idx){
+		if(data.length-1<idx)
+			return "";
+		else
+			return data[idx];
+	}
+	
+	
 	
 	public static ArrayList<Sponsor> getSponsors() throws ClientProtocolException, IOException{
 		ArrayList<Sponsor> items = new ArrayList<Sponsor>();

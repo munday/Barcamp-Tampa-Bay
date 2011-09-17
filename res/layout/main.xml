@@ -5,62 +5,19 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bg"
     >
-    
-	<RelativeLayout
-		android:layout_width="fill_parent"
-		android:layout_height="50dp"
-		android:padding="0dip"
-		android:gravity="center_vertical"
-		android:background="@drawable/titlebar"
-		android:fadingEdge="vertical"
-		android:visibility="gone"
-		>
-		
-			<TextView
-				android:id="@+id/title"
-				android:text="@string/app_name"
-				android:textSize="20dp"
-				android:textStyle="bold"
-				android:textColor="#ffffffff"
-				android:shadowColor="#ff000000"
-				android:shadowDx="-2"
-				android:shadowDy="-2"
-				android:shadowRadius="1"
-				android:gravity="center_vertical"
-				android:layout_width="wrap_content"
-				android:paddingLeft="10dip"
-				android:layout_height="50dip"
-				android:layout_alignParentLeft="true"
-				android:layout_toLeftOf="@+id/new_btna"/>
-			
-			<LinearLayout
-				android:focusable="true"
-				android:clickable="true"
-				android:layout_width="50dip"
-				android:layout_height="50dip"
-				android:layout_gravity="center" 
-				android:layout_alignParentRight="true"
-				android:gravity="center"
-				android:background="@drawable/titlebar">
-			
-				<Button
-					android:id="@+id/new_btn"
-					android:background="@drawable/homeicon"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"	
-				/>
-			
-			</LinearLayout>
-			
 
-	</RelativeLayout>
-
+   	<ImageView 
+		android:id="@+id/logo"
+		android:src="@drawable/barcamptampalogo"
+	 	android:layout_width="fill_parent"
+	 	android:layout_height="wrap_content"
+	 	android:layout_margin="10dp"
+	 	android:scaleType="fitCenter" />
 	
 	<ScrollView
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:fadingEdge="vertical"
-		android:fadingEdgeLength="10dp"
 		android:layout_gravity="center"
 		android:gravity="fill"
 		android:layout_weight="2"
@@ -70,34 +27,26 @@
 		<LinearLayout 
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
-			android:layout_gravity="top"
+			android:layout_gravity="center_vertical"
 			android:gravity="center"
-			android:orientation="vertical"
-			android:layout_marginTop="10dp">
+			android:orientation="vertical">
 			
-			<ImageView 
-				android:src="@drawable/barcamptampalogo"
-			 	android:layout_width="fill_parent"
-			 	android:layout_height="wrap_content"
-			 	android:scaleType="fitCenter"
-			 />
+			
 			
 			<TableLayout 
 				android:id="@+id/main_menu"
 				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				android:layout_gravity="top"
-				android:gravity="center"
-				android:orientation="vertical"
-				android:layout_marginTop="10dp"
-				
-			>
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:gravity="center">
 			</TableLayout>
 			
 		</LinearLayout>
 		
 	</ScrollView>
+	
 	<TextView 
+		android:id="@+id/tweets_head"
 		android:text="Tweets"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -106,7 +55,9 @@
 		android:textColor="#000000"
 		android:textSize="20dp"
 		android:textStyle="bold"/>
+		
 	<LinearLayout
+		android:id="@+id/tweets"
 		android:padding="5dip"
 		android:background="@drawable/bg_dark"
 		android:layout_weight="0" 

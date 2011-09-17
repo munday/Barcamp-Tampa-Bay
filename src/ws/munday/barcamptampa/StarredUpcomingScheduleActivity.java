@@ -1,5 +1,6 @@
 package ws.munday.barcamptampa;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -31,13 +32,13 @@ import android.widget.TextView;
 public class StarredUpcomingScheduleActivity extends Activity implements StarCheckListener {
 
 	private Handler handler;
-	private DatabaseSyncer dbSyncer;
 	private barcampDbHelper dbHelper;
 	private SQLiteDatabase db;
 	ScheduleItemAdapter items;
 	private Animation refreshAnim;
 	private final Date CONFERENCE_DATE = new Date("11/24/2011");
 	private Date today;
+	private DatabaseSyncer dbSyncer;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +49,10 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
         refreshAnim = AnimationUtils.loadAnimation(getApplicationContext(),anim.rotate);
         
         handler = new Handler();
-        dbSyncer = new DatabaseSyncer(getApplicationContext());		
-        dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
-		db = dbHelper.getWritableDatabase();
-	
+        
+        TextView t = (TextView)findViewById(id.noitems);
+        t.setText("Barcamp Tampa Starts on September 24th. Your upcoming starred presentations will appear here.");
+		
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
 			
@@ -61,16 +62,20 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 			}
 		});
 		
+		SimpleDateFormat f = new SimpleDateFormat("h:mm a");
 		TextView title = (TextView)findViewById(id.title);
-		title.setText("Presentations at " + getNextTalkTime());
+		title.setText("Presentations at " + f.format(new Date(getNextTalkTime())));
 		
 		
 	}
 	
 	@Override
 	protected void onStart() {
+		dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
+		db = dbHelper.getWritableDatabase();
+		dbSyncer = new DatabaseSyncer(this);
 		ListView l = (ListView)findViewById(id.scheduleitems);
-		new syncTask().execute();
+		new loadTask().execute();
 		l.setOnItemClickListener( new OnItemClickListener() {
 
 			@Override
@@ -84,16 +89,18 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 			}
 			
 		});
+		ImageView refresh = (ImageView) findViewById(id.refresh);
+		refresh.startAnimation(refreshAnim);
 		
 		super.onStart();
 	}
 	
 	@Override
-	protected void onDestroy() {
-		dbSyncer.close();
+	protected void onStop() {
 		db.close();
 		dbHelper.close();
-		super.onDestroy();
+		dbSyncer.close();
+		super.onStop();
 	}
 	
 	private ArrayList<ScheduleItem> getItems(){
@@ -113,9 +120,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 							BarcampTampaContentProvider.STARRED};
 		
 		Cursor c = db.query(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, columns, 
-				 BarcampTampaContentProvider.STARRED + "=1 AND " + BarcampTampaContentProvider.START_TIME + "='" + getNextTalkTime() + "'", null, null, null,BarcampTampaContentProvider.START_TIME);
-		
-		Log.d("bctb", getNextTalkTime());
+				 BarcampTampaContentProvider.STARRED + "=1 AND " + BarcampTampaContentProvider.START_TIME + ">=" + new Date(getNextTalkTime()).getTime(), null, null, null,BarcampTampaContentProvider.START_TIME,"1");
 		
 		if(c!=null){
 			while(c.moveToNext()){
@@ -134,6 +139,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
 				itms.add(i);
 			}
+			c.close();
 		}
 		
 		Collections.sort(itms, new TimeComparer());
@@ -143,12 +149,15 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 	
 	private String getNextTalkTime(){
 		today = Calendar.getInstance().getTime();
-		if(today.before(CONFERENCE_DATE)){
+		long diff = CONFERENCE_DATE.getTime() - today.getTime();
+		long days = diff / (1000 * 60 * 60 * 24);
+		
+		if(days > 0){
 			//conference not started, show the unavailable message
-			return "9:00 AM";		
-		}else if(today.after(CONFERENCE_DATE)){
+			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "9:00 AM";		
+		}else if(days < 0){
 			//conference over, show the last talk
-			return "6:00 PM";
+			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "6:00 PM";
 		}else{
 			//day of conference
 			Calendar c = Calendar.getInstance();
@@ -160,7 +169,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 			}else if(min > 30){
 				min = 00;
 			}
-			return hour + ":" + (min<10?"0"+min:min) + " " + (amPm==1?"PM":"AM");
+			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + hour + ":" + (min<10?"0"+min:min) + " " + (amPm==1?"PM":"AM");
 			
 		}
 	}
@@ -178,6 +187,13 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 	public boolean OnItemStarred(long id, boolean star) {
 		return starItem(id, star);
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		db.close();
+		dbHelper.close();
+		super.finalize();
+	}
 	
 	class syncTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
 
@@ -192,42 +208,94 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 					refresh.startAnimation(refreshAnim);
 				}
 			});
+ 			
  			return getItems();
  		}
      	
  		public void onPostExecute(ArrayList<ScheduleItem> result) {
  			Log.d("bctb","sync done");
-	 			TextView t = (TextView)findViewById(id.noitems);
-	 			ListView l = (ListView)findViewById(id.scheduleitems);
-	 			
-	 			if(result.isEmpty()){
-	 				l.setVisibility(View.GONE);
-	 				t.setText("The schedule will be available on September 24th, the day of the event. \nAs presentations are added to the schedule they will appear here.");
-	 				t.setVisibility(View.VISIBLE);
-	 			}else{
-	 				l.setVisibility(View.VISIBLE);
-	 				t.setVisibility(View.GONE);
-	 			}
+ 			TextView t = (TextView)findViewById(id.noitems);
+ 			ListView l = (ListView)findViewById(id.scheduleitems);
  			
- 				if(items==null){
- 					items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
- 					l = (ListView)findViewById(id.scheduleitems);
- 					l.setAdapter(items);
- 				}else{
- 					items.setItems(result);
- 					items.notifyDataSetChanged();
- 				}
- 			
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refresh.clearAnimation();
-					}
-				}, 600); 
+ 			if(result.isEmpty()){
+ 				l.setVisibility(View.GONE);
+ 				t.setVisibility(View.VISIBLE);
+ 			}else{
+ 				l.setVisibility(View.VISIBLE);
+ 				t.setVisibility(View.GONE);
+ 			}
+		
+			if(items==null){
+				items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
+				l = (ListView)findViewById(id.scheduleitems);
+				l.setAdapter(items);
+			}else{
+				items.setItems(result);
+				items.notifyDataSetChanged();
+			}
+		
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					refresh.clearAnimation();
+				}
+			}, 600); 
 			
 			
 		}
  		
      };
+     
+     class loadTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
+
+   		final ImageView refresh = (ImageView) findViewById(id.refresh);
+   		
+    		@Override
+    		public ArrayList<ScheduleItem> doInBackground(Void... params) {
+    			runOnUiThread(new Runnable() {
+   				
+   				@Override
+   				public void run() {
+   					if(refresh.getAnimation()==null)
+   						refresh.startAnimation(refreshAnim);
+   				}
+   			});
+
+    			
+    			return getItems();
+    		}
+        	
+    		public void onPostExecute(ArrayList<ScheduleItem> result) {
+    			Log.d("bctb","load done");
+    			TextView t = (TextView)findViewById(id.noitems);
+     			ListView l = (ListView)findViewById(id.scheduleitems);
+     			
+     			if(result.isEmpty()){
+     				l.setVisibility(View.GONE);
+     				t.setVisibility(View.VISIBLE);
+     			}else{
+     				l.setVisibility(View.VISIBLE);
+     				t.setVisibility(View.GONE);
+     			}
+    			
+    			if(items==null){
+					items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
+					l.setAdapter(items);
+				}else{
+					items.setItems(result);
+					items.notifyDataSetChanged();
+				}
+			
+   				handler.postDelayed(new Runnable() {
+   					@Override
+   					public void run() {
+   						refresh.clearAnimation();
+   					}
+   				}, 600); 
+   			
+   			
+   		}
+    		
+        };
 	
 }

@@ -31,9 +31,6 @@ public class ScheduleItemAdapter extends BaseAdapter{
 		this.inflater = LayoutInflater.from(this.context);
 		this.items = items;
 		this.checkListener = l;
-		dbHelper = new barcampDbHelper(this.context, BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
-		db = dbHelper.getWritableDatabase();
-	
 	}
 
 	public ArrayList<ScheduleItem> getItems() {
@@ -128,7 +125,7 @@ public class ScheduleItemAdapter extends BaseAdapter{
 		
 		if(s.conflictingItems != null && s.conflictingItems.size()>0){
 			holder.conflict.setVisibility(View.VISIBLE);
-			holder.conflict.setText("conflict - " + s.conflictingItems.size() + " other talk" + (s.conflictingItems.size()>1?"s":"") + " starred at " + s.startTime);
+			holder.conflict.setText("conflict - " + s.conflictingItems.size() + " other talk" + (s.conflictingItems.size()>1?"s":"") + " starred at " + f.format(s.startTime));
 		}else{
 			holder.conflict.setVisibility(View.GONE);
 		}
@@ -152,6 +149,10 @@ public class ScheduleItemAdapter extends BaseAdapter{
 	}
 
 	public boolean isItemStarred(long id){
+		
+		dbHelper = new barcampDbHelper(this.context, BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
+		db = dbHelper.getWritableDatabase();
+		
 		String[] columns = {BarcampTampaContentProvider.SCHEDULE_ITEM_ID,
 				BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID,
 				BarcampTampaContentProvider.ROOM_NAME,
@@ -170,16 +171,25 @@ public class ScheduleItemAdapter extends BaseAdapter{
 				
 				if(c!=null){
 					c.moveToFirst();
-					return c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+					boolean val = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+					c.close();
+					db.close();
+					dbHelper.close();
+					return val;
 				}else{
+					db.close();
+					dbHelper.close();
 					return false;
 				}
+			
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		db.close();
-		dbHelper.close();
+		if(db!=null)
+			db.close();
+		if(dbHelper!=null)
+			dbHelper.close();
 		super.finalize();
 	}
 	

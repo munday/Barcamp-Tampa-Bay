@@ -25,6 +25,10 @@
 		<activity android:name=".UpcomingScheduleActivity" android:theme="@style/Theme.Main" android:label="@string/app_name" android:configChanges="orientation|keyboardHidden">
         </activity>
 
+		<activity android:name=".StarredUpcomingScheduleActivity" android:theme="@style/Theme.Main" android:label="@string/app_name" android:configChanges="orientation|keyboardHidden">
+        </activity>
+
+
 		<activity android:name=".SponsorsActivity" android:theme="@style/Theme.Main" android:label="@string/app_name" android:configChanges="orientation|keyboardHidden">
         </activity>
 

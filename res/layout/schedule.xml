@@ -11,61 +11,74 @@
 			android:layout_height="fill_parent"
 			android:layout_gravity="top"
 			android:gravity="center"
+			android:orientation="vertical">
+			
+			<RelativeLayout 
+			android:paddingTop="10dp"
+			android:id="@+id/head_container"
+			android:background="@drawable/bg_dark"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="top"
+			android:gravity="center"
 			android:orientation="vertical"
-			android:layout_marginTop="10dp">
-			
-			<ImageView 
-				android:id="@+id/refresh"
-				android:layout_width="wrap_content"
-				android:layout_height="40dp"
-				android:layout_marginTop="5dp"
-				android:layout_marginBottom="5dp"
-				android:src="@drawable/reload"
-				android:layout_alignParentRight="true"/>
-			
-			<ImageView 
-				android:id="@+id/logo"
-				android:src="@drawable/barcamptampalogo"
-			 	android:layout_width="fill_parent"
-			 	android:layout_height="50dip"
-			 	android:scaleType="fitStart"
-			 	android:layout_alignParentTop="true"
-			/>
-			
-			<TextView 
-				android:id="@+id/title"
-				android:layout_marginLeft="60dp"
-				android:layout_marginTop="-10dp"
-				android:textSize="20dp"
-				android:layout_width="fill_parent" 
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/logo"
-				android:text="Conference Schedule"
-				android:gravity="left"
-				android:textColor="#6eb5f9"
+			android:layout_alignParentTop="true"
+			>
+				
+				<ImageView 
+					android:id="@+id/refresh"
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:layout_marginTop="5dp"
+					android:layout_marginBottom="5dp"
+					android:layout_marginRight="5dp"
+					android:src="@drawable/reload_blue"
+					android:scaleType="fitCenter"
+				 	android:layout_alignParentRight="true"/>
+				
+				<ImageView 
+					android:id="@+id/logo"
+					android:src="@drawable/barcamptampalogo"
+				 	android:layout_width="fill_parent"
+				 	android:layout_height="50dip"
+				 	android:scaleType="fitStart"
+				 	android:layout_alignParentTop="true"
 				/>
 				
-			<TextView
-				android:id="@+id/header_divider"
-				android:layout_width="fill_parent"
-				android:layout_height="1dp"
-				android:layout_marginTop="10dp"
-				android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
-				android:layout_below="@+id/title"
-				android:fadingEdge="vertical"
-				android:background="#eed5d5d5"
-				android:visibility="gone"/>
+				<TextView 
+					android:id="@+id/title"
+					android:layout_marginLeft="60dp"
+					android:layout_marginTop="-10dp"
+					android:textSize="20dp"
+					android:layout_width="fill_parent" 
+					android:layout_height="wrap_content"
+					android:layout_below="@+id/logo"
+					android:text="Conference Schedule"
+					android:gravity="left"
+					android:textColor="#6eb5f9"
+					/>
 					
+				<TextView
+					android:id="@+id/header_divider"
+					android:layout_width="fill_parent"
+					android:layout_height="1dp"
+					android:layout_marginTop="10dp"
+					android:layout_marginLeft="10dp"
+					android:layout_marginRight="10dp"
+					android:layout_below="@+id/title"
+					android:fadingEdge="vertical"
+					android:background="#eed5d5d5"
+					android:visibility="gone"/>
+
+			</RelativeLayout>
+			
 			<ListView 
 				android:id="@+id/scheduleitems"
 				android:listSelector="@drawable/selector"
 				android:layout_width="fill_parent" 
 				android:layout_height="fill_parent"
 				android:layout_alignParentBottom="true"
-				android:layout_below="@+id/header_divider"
-				android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
+				android:layout_below="@+id/head_container"
 				android:layout_marginBottom="25dp"
 				android:layout_marginTop="0dp"
 				android:fadingEdge="vertical"
@@ -78,13 +91,13 @@
 			<TextView 
 				android:id="@+id/noitems"
 				android:gravity="center"
-				android:layout_margin="10dp"
+				android:layout_margin="20dp"
 				android:textSize="18dp"
 				android:visibility="gone"
 				android:layout_width="fill_parent" 
 				android:layout_height="fill_parent"
 				android:layout_alignParentBottom="true"
-				android:layout_below="@+id/logo"
+				android:layout_below="@+id/head_container"
 				android:text="Nothing Here"
 				/>
 			

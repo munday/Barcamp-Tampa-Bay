@@ -9,19 +9,8 @@
 	    	android:layout_width="fill_parent"
 	    	android:layout_height="wrap_content"
 	    	android:orientation="vertical"
-	    	android:layout_alignParentLeft="true">
-		    
-		    <ImageView
-		    	android:id="@+id/sponsor_image"
-		    	android:layout_width="fill_parent"
-		    	android:layout_height="100dp" 
-		    	android:scaleType="fitStart"
-		    	/>
-		    <LinearLayout 
-		    	android:orientation="horizontal"
-		    	android:layout_width="fill_parent"
-		    	android:layout_height="wrap_content"
-		    ></LinearLayout>
+	    	android:layout_alignParentLeft="true"
+	    	android:padding="5dp">
 		    <TextView 
 		    	android:id="@+id/sponsor_name"
 		    	android:layout_width="wrap_content"
@@ -30,23 +19,17 @@
 		    	android:gravity="center_vertical"
 		    	android:textSize="20dp"
 		    	android:textColor="#555555"
-		    	android:ellipsize="end"	/>
-		    	
-		    
-		    <TextView 
-		    	android:id="@+id/sponsor_desc"
-		    	android:layout_width="wrap_content"
-		    	android:layout_height="wrap_content"
-		    	android:textSize="15dp"
-		    	android:linksClickable="true"
+		    	android:ellipsize="end"	
+		    	android:paddingBottom="5dp"
+		    	/>
+		    <ImageView
+		    	android:id="@+id/sponsor_image"
+		    	android:layout_width="fill_parent"
+		    	android:layout_height="200dp" 
+		    	android:scaleType="fitStart"
 		    	/>
 		    
-		    <TextView 
-		    	android:id="@+id/sponsor_url"
-		    	android:layout_width="wrap_content"
-		    	android:layout_height="wrap_content"
-		    	android:textSize="15dp"
-		    	android:autoLink="all" />
+		    
 		    
 		    
 	    </LinearLayout>	

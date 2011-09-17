@@ -1,15 +1,13 @@
 package ws.munday.barcamptampa;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -20,11 +18,13 @@ public class SponsorAdapter extends BaseAdapter{
 	private ArrayList<Sponsor> items;
 	private final LayoutInflater inflater;
 	private final Context context;
+	private DrawableManager drawManager;
 	
 	public SponsorAdapter(ArrayList<Sponsor> items, Context c) {
 		this.context = c;
 		this.inflater = LayoutInflater.from(this.context);
 		this.items = items;
+		drawManager = new DrawableManager();
 	}
 
 	public ArrayList<Sponsor> getItems() {
@@ -84,8 +84,8 @@ public class SponsorAdapter extends BaseAdapter{
 			holder = new ViewHolder();
 			holder.name = (TextView) convertView.findViewById(R.id.sponsor_name);
 			holder.img = (ImageView) convertView.findViewById(R.id.sponsor_image);
-			holder.desc = (TextView) convertView.findViewById(R.id.sponsor_desc);
-			holder.url = (TextView) convertView.findViewById(R.id.sponsor_url);
+			//holder.desc = (TextView) convertView.findViewById(R.id.sponsor_desc);
+			//holder.url = (TextView) convertView.findViewById(R.id.sponsor_url);
 			
 			convertView.setTag(holder);
 			
@@ -98,9 +98,17 @@ public class SponsorAdapter extends BaseAdapter{
 		// Bind the data efficiently with the holder.
 		
 		holder.name.setText(s.name);
-		holder.img.setImageDrawable(getWebImageDrawable(s.img));
-		holder.desc.setText(s.desc);
-		holder.url.setText(s.url);
+		holder.img.setImageDrawable(drawManager.fetchDrawable(s.img));
+		final String url = s.url;
+		holder.img.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+			}
+		});
+		//holder.desc.setText(s.desc);
+		//holder.url.setText(s.url);
 
 		return convertView;
 		
@@ -111,26 +119,6 @@ public class SponsorAdapter extends BaseAdapter{
 		TextView name;
 		TextView desc;
 		TextView url;
-	}
-
-	private Drawable getWebImageDrawable(String url) {
-		try {
-			InputStream is = (InputStream) this.getFromWeb(url);
-			Drawable d = Drawable.createFromStream(is, "src");
-			return d;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public Object getFromWeb(String address) throws MalformedURLException,IOException {
-		URL url = new URL(address);
-		Object content = url.getContent();
-		return content;
 	}
 	
 	@Override
