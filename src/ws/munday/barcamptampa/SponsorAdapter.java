@@ -97,7 +97,8 @@ public class SponsorAdapter extends BaseAdapter{
 
 		// Bind the data efficiently with the holder.
 		
-		holder.name.setText(s.name);
+		holder.name.setVisibility(View.GONE);
+		//holder.name.setText(s.name);
 		holder.img.setImageDrawable(drawManager.fetchDrawable(s.img));
 		final String url = s.url;
 		holder.img.setOnClickListener(new OnClickListener() {

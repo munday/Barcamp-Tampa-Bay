@@ -110,7 +110,9 @@ public class ScheduleItemAdapter extends BaseAdapter{
 		holder.title.setText(s.title);
 		holder.star.setChecked(s.isStarred);
 		holder.speaker.setText("by " + s.speaker + " ");
-		holder.speakerTwitter.setText(s.speakerTwitter);
+		if(s.speakerTwitter.trim().length()>0)
+			holder.speakerTwitter.setText("(" + s.speakerTwitter + ")");
+		
 		holder.star.setChecked(isItemStarred(s.id));
 		
 		holder.star.setOnClickListener(new OnClickListener() {

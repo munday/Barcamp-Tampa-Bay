@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -122,13 +123,13 @@ public class BarcampTampaActivity extends Activity {
     public void buildHomeIcons(int padding){
     	
     	homeIcons = new ArrayList<View>();
-        homeIcons.add(makeIcon(R.drawable.schedule, padding, ScheduleActivity.class));
-        homeIcons.add(makeIcon(R.drawable.starred, padding, StarredScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.schedule, "Schedule", padding, ScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.starred, "Starred", padding, StarredScheduleActivity.class));
         
-        homeIcons.add(makeIcon(R.drawable.schedule, padding, UpcomingScheduleActivity.class));
-        homeIcons.add(makeIcon(R.drawable.starred, padding, StarredUpcomingScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.next, "What's Next", padding, UpcomingScheduleActivity.class));
+        homeIcons.add(makeIcon(R.drawable.next_starred, "Next Starred", padding, StarredUpcomingScheduleActivity.class));
         
-        homeIcons.add(makeIcon(R.drawable.sponsors, padding, SponsorsActivity.class));
+        homeIcons.add(makeIcon(R.drawable.sponsors, "Sponsors", padding, SponsorsActivity.class));
 
         /*
         LinearLayout l = new LinearLayout(this);
@@ -151,12 +152,14 @@ public class BarcampTampaActivity extends Activity {
         */
     }
     
-    private LinearLayout makeIcon(int drawable, int padding, final Class<?> c){
+    private LinearLayout makeIcon(int drawable, String text, int padding, final Class<?> c){
     	LinearLayout l = new LinearLayout(this);
         l.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
         l.setGravity(Gravity.CENTER);
+        l.setOrientation(LinearLayout.VERTICAL);
         l.setPadding(padding, padding, padding, padding);
         ImageView img = new ImageView(this);
+        img.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         img.setBackgroundDrawable(getResources().getDrawable(drawable));
         img.setOnClickListener(new OnClickListener() {
 			
@@ -167,8 +170,12 @@ public class BarcampTampaActivity extends Activity {
 				startActivity(i);
 			}
 		});
-        
+        TextView t = new TextView(this);
+        t.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+        t.setText(text);
+        t.setGravity(Gravity.CENTER);
         l.addView(img);
+        l.addView(t);
         return l;
     }
     
