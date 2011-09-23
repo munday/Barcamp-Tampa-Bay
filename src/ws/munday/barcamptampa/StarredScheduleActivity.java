@@ -1,12 +1,8 @@
 package ws.munday.barcamptampa;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-
-import org.apache.http.client.ClientProtocolException;
-
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import ws.munday.barcamptampa.R.anim;
 import ws.munday.barcamptampa.R.id;
@@ -48,7 +44,7 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
         handler = new Handler();
         
         TextView t = (TextView)findViewById(id.noitems);
-		t.setText("Barcamp Tampa Starts on September 24th. When you star presentations they will appear here.");
+		t.setText("You haven't starred any presentations yet. When you do, they'll show here.");
 		
         
 		ImageView refresh = (ImageView) findViewById(id.refresh);
@@ -56,7 +52,7 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 			
 			@Override
 			public void onClick(View v) {
-				new syncTask().execute();
+				new loadTask().execute();
 			}
 		});
 		
@@ -136,10 +132,12 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 				i.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
 				i.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
-				for (ScheduleItem itm : itms) {
-					if(itm.startTime.equals(i.startTime)){
-						i.conflictingItems.add(itm);
-						itm.conflictingItems.add(i);
+				if(i.isStarred){
+					for (ScheduleItem itm : itms) {
+						if(itm.startTime.equals(i.startTime) && itm.isStarred){
+							i.conflictingItems.add(itm);
+							itm.conflictingItems.add(i);
+						}
 					}
 				}
 				itms.add(i);
@@ -166,55 +164,6 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 	}
 	
 	
-	class syncTask extends UserTask<Void, Void, Void>{
-
-		final ImageView refresh = (ImageView) findViewById(id.refresh);
-		
- 		@Override
- 		public Void doInBackground(Void... params) {
- 			runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					refresh.startAnimation(refreshAnim);
-				}
-			});
- 			
- 			try {
-				dbSyncer.syncData();
-			} catch (ClientProtocolException e) {
-			} catch (IOException e) {
-			}
- 			
- 			items = new ScheduleItemAdapter(getItems(), StarredScheduleActivity.this, getApplicationContext());
-			return null;
- 		}
-     	
- 		public void onPostExecute(Void result) {
- 			Log.d("bctb","sync done");
- 			
-			ListView l = (ListView)findViewById(id.scheduleitems);
-			TextView t = (TextView)findViewById(id.noitems);
-			
-			if(items.isEmpty()){
-				l.setVisibility(View.GONE);
-				t.setVisibility(View.VISIBLE);
-			}else{
-				l.setVisibility(View.VISIBLE);
-				t.setVisibility(View.GONE);
-			}
-			
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					refresh.clearAnimation();
-				}
-			}, 600); 
-		
-			
-		}
- 		
-     };
 
      class loadTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
 

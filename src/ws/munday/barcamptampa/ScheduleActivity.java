@@ -49,7 +49,7 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
         
         handler = new Handler();
         TextView t = (TextView)findViewById(id.noitems);
-		t.setText("Barcamp Tampa Starts on September 24th. The schedule will appear here as it is created.");
+		t.setText("The schedule isn't available yet. It will show here as it's created.");
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
 			
@@ -133,6 +133,14 @@ public class ScheduleActivity extends Activity implements StarCheckListener {
 				i.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
 				i.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+				if(i.isStarred){
+					for (ScheduleItem itm : itms) {
+						if(itm.startTime.equals(i.startTime) && itm.isStarred){
+							i.conflictingItems.add(itm);
+							itm.conflictingItems.add(i);
+						}
+					}
+				}
 				itms.add(i);
 			}
 			c.close();

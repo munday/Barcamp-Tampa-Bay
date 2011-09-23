@@ -51,7 +51,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
         handler = new Handler();
         
         TextView t = (TextView)findViewById(id.noitems);
-		t.setText("Barcamp Tampa Starts on September 24th. Upcoming presentations will appear here.");
+		t.setText("The schedule isn't available yet. Upcoming presentations will show here when it's created.");
 			
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +92,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 		
 		SimpleDateFormat f = new SimpleDateFormat("h:mm a");
 		TextView title = (TextView)findViewById(id.title);
-		title.setText("Presentations at " + f.format(new Date(getNextTalkTime())));
+		title.setText("Next @" + f.format(new Date(getNextTalkTime())));
 		
 		super.onStart();
 	}
@@ -139,6 +139,14 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 				i.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
 				i.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+				if(i.isStarred){
+					for (ScheduleItem itm : itms) {
+						if(itm.startTime.equals(i.startTime) && itm.isStarred){
+							i.conflictingItems.add(itm);
+							itm.conflictingItems.add(i);
+						}
+					}
+				}
 				itms.add(i);
 			}
 			c.close();
@@ -156,7 +164,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 		
 		if(days > 0){
 			//conference not started, show the unavailable message
-			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "9:00 AM";		
+			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "8:00 AM";		
 		}else if(days < 0){
 			//conference over, show the last talk
 			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "6:00 PM";

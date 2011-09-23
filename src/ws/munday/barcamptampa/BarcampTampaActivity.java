@@ -8,18 +8,14 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import ws.munday.barcamptampa.R.id;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable.Orientation;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,12 +27,10 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class BarcampTampaActivity extends Activity {
 
@@ -94,28 +88,13 @@ public class BarcampTampaActivity extends Activity {
     public void onConfigurationChanged(Configuration newConfig) {
     	
     	
-    	/*
-    	TextView tweetHead=(TextView) findViewById(id.tweets_head);
-		LinearLayout tweets = (LinearLayout) findViewById(id.tweets);
-		ImageView logo = (ImageView) findViewById(id.logo);
-		*/
     	if (newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
     		buildHomeIcons(5);
     		createButtonGrid(R.id.main_menu,10, homeIcons);
-        	/*
-    		logo.setScaleType(ScaleType.FIT_START);
-    		tweetHead.setVisibility(View.GONE);
-    		tweets.setVisibility(View.GONE);
-    		*/
-    	}else{
+        }else{
     		buildHomeIcons(10);
     		createButtonGrid(R.id.main_menu,40, homeIcons);
-        	/*
-    		logo.setScaleType(ScaleType.FIT_CENTER);
-    		tweetHead.setVisibility(View.VISIBLE);
-    		tweets.setVisibility(View.VISIBLE);
-    		*/
-    	}
+        }
     	
     	super.onConfigurationChanged(newConfig);
     }
@@ -131,25 +110,6 @@ public class BarcampTampaActivity extends Activity {
         
         homeIcons.add(makeIcon(R.drawable.sponsors, "Sponsors", padding, SponsorsActivity.class));
 
-        /*
-        LinearLayout l = new LinearLayout(this);
-        l.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        l.setGravity(Gravity.CENTER);
-        l.setPadding(padding, padding, padding, padding);
-        ImageView img = new ImageView(this);
-        img.setBackgroundDrawable(getResources().getDrawable(R.drawable.location));
-        img.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				String url = "http://maps.google.com/maps?daddr=1001+East+Palm+Ave+Tampa+FL+33605+(Kforce+Professional+Staffing)";
-				Intent intent = new Intent(android.content.Intent.ACTION_VIEW,  Uri.parse(url));
-				startActivity(intent);
-			}
-		});
-        l.addView(img);
-        homeIcons.add(l);
-        */
     }
     
     private LinearLayout makeIcon(int drawable, String text, int padding, final Class<?> c){

@@ -117,9 +117,8 @@ public class ScheduleItemActivity extends Activity {
 			TextView speaker = (TextView) findViewById(R.id.talk_speaker);
 			speaker.setText("by " + i.speaker);
 			
-			if(i.speakerTwitter!=null){
-				speaker.setText("by " + i.speaker + "(" + i.speakerTwitter + ")");
-				
+			if(i.speakerTwitter.trim().length()>0){
+				speaker.setText("by " + i.speaker + " (" + i.speakerTwitter + ")");
 			}
 			
 			CheckBox star = (CheckBox) findViewById(R.id.starred);

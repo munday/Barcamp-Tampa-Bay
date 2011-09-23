@@ -25,16 +25,16 @@ public class CSVReader {
 			
 			ScheduleItem i = new ScheduleItem();
 			i.sheetId = getData(data,0);
-			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,1));
+			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,2));
 			Log.d("bctb", i.startTime.toString());
-			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,2));
-			i.roomName = getData(data,3);
-			i.title = getData(data,4);
-			i.description = getData(data,5);
-			i.speaker = getData(data,6);
-			i.speakerTwitter = getData(data,7);
-			i.speakerWebsite = getData(data,8);
-			i.slidesUrl = getData(data,9);
+			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,3));
+			i.roomName = getData(data,4);
+			i.title = getData(data,5);
+			i.description = getData(data,6);
+			i.speaker = getData(data,7);
+			i.speakerTwitter = getData(data,8);
+			i.speakerWebsite = getData(data,9);
+			i.slidesUrl = getData(data,10);
 			
 			items.add(i);
 			

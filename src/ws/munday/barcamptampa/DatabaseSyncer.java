@@ -1,7 +1,6 @@
 package ws.munday.barcamptampa;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -55,8 +54,6 @@ public class DatabaseSyncer {
 	
 	private void upsertScheduleItem(ScheduleItem i){
 		ContentValues v = new ContentValues();
-		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Log.d("bctb",f.format(i.startTime));
 		v.put(BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID, Integer.parseInt(i.sheetId));
 		v.put(BarcampTampaContentProvider.START_TIME, i.startTime.getTime());
 		v.put(BarcampTampaContentProvider.END_TIME, i.endTime.getTime());

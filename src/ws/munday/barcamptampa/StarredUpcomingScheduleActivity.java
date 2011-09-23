@@ -51,7 +51,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
         handler = new Handler();
         
         TextView t = (TextView)findViewById(id.noitems);
-        t.setText("Barcamp Tampa Starts on September 24th. Your upcoming starred presentations will appear here.");
+        t.setText("You haven't starred any presentations yet. When you do, they will appear here.");
 		
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +64,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 		
 		SimpleDateFormat f = new SimpleDateFormat("h:mm a");
 		TextView title = (TextView)findViewById(id.title);
-		title.setText("Presentations at " + f.format(new Date(getNextTalkTime())));
+		title.setText("Starred @" + f.format(new Date(getNextTalkTime())));
 		
 		
 	}
@@ -120,7 +120,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 							BarcampTampaContentProvider.STARRED};
 		
 		Cursor c = db.query(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, columns, 
-				 BarcampTampaContentProvider.STARRED + "=1 AND " + BarcampTampaContentProvider.START_TIME + ">=" + new Date(getNextTalkTime()).getTime(), null, null, null,BarcampTampaContentProvider.START_TIME,"1");
+				 BarcampTampaContentProvider.STARRED + "=1 AND " + BarcampTampaContentProvider.START_TIME + "=" + new Date(getNextTalkTime()).getTime(), null, null, null,BarcampTampaContentProvider.START_TIME,null);
 		
 		if(c!=null){
 			while(c.moveToNext()){
@@ -137,6 +137,14 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 				i.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
 				i.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
 				i.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+				if(i.isStarred){
+					for (ScheduleItem itm : itms) {
+						if(itm.startTime.equals(i.startTime) && itm.isStarred){
+							i.conflictingItems.add(itm);
+							itm.conflictingItems.add(i);
+						}
+					}
+				}
 				itms.add(i);
 			}
 			c.close();
@@ -154,7 +162,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 		
 		if(days > 0){
 			//conference not started, show the unavailable message
-			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "9:00 AM";		
+			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "8:00 AM";		
 		}else if(days < 0){
 			//conference over, show the last talk
 			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "6:00 PM";
