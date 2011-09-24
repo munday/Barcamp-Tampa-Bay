@@ -34,6 +34,14 @@ public class DatabaseSyncer {
 		try{
 			db.beginTransaction();
 			removeDeleted(schedule, dbschedule);
+			db.setTransactionSuccessful();
+		}catch(Exception e){ }
+		finally{
+			db.endTransaction();
+		}
+		
+		try{
+			db.beginTransaction();
 			for(ScheduleItem i:schedule){
 				upsertScheduleItem(i);
 			}
