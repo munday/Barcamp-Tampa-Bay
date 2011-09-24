@@ -56,18 +56,12 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 			}
 		});
 		
-		
-		
-	}
-	
-	@Override
-	protected void onStart() {
 		ListView l = (ListView)findViewById(id.scheduleitems);
 		dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
 		db = dbHelper.getWritableDatabase();
 		dbSyncer = new DatabaseSyncer(this);
 		
-		new loadTask().execute();
+		//new loadTask().execute();
 		l.setOnItemClickListener( new OnItemClickListener() {
 
 			@Override
@@ -85,14 +79,19 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 		TextView title = (TextView)findViewById(id.title);
 		title.setText("Starred Presentations");
 		
-		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.startAnimation(refreshAnim);
 		
+		
+	}
+	
+	@Override
+	protected void onStart() {
+		new loadTask().execute();
 		super.onStart();
 	}
 	
 	@Override
-	protected void onStop() {
+	protected void onDestroy() {
 		db.close();
 		dbHelper.close();
 		dbSyncer.close();
@@ -160,7 +159,25 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
 
 	@Override
 	public boolean OnItemStarred(long id, boolean star) {
-		return starItem(id, star);
+		boolean s = starItem(id, star);
+		ListView l = (ListView)findViewById(R.id.scheduleitems);
+		TextView t = (TextView)findViewById(R.id.noitems);
+		ArrayList<ScheduleItem> itms = getItems();
+		if(items==null){
+			items = new ScheduleItemAdapter(itms, StarredScheduleActivity.this, getApplicationContext());
+			l.setAdapter(items);
+		}else{
+			items.setItems(itms);
+			items.notifyDataSetChanged();
+		}
+		if(itms==null || itms.isEmpty()){
+				l.setVisibility(View.GONE);
+				t.setVisibility(View.VISIBLE);
+		}else{
+			l.setVisibility(View.VISIBLE);
+			t.setVisibility(View.GONE);
+		}
+		return s;
 	}
 	
 	
@@ -180,28 +197,34 @@ public class StarredScheduleActivity extends Activity implements StarCheckListen
   				}
   			});
 
-   			
-   			return getItems();
+   			try{
+   				return getItems();
+   			}catch(Exception e){
+   				return null;
+   			}
    		}
        	
    		public void onPostExecute(ArrayList<ScheduleItem> result) {
    			Log.d("bctb","load done");
    			ListView l = (ListView)findViewById(id.scheduleitems);
    			TextView t = (TextView)findViewById(id.noitems);
-   			if(result.isEmpty()){
+   			
+   			if(result!=null && result.isEmpty()){
 				l.setVisibility(View.GONE);
 				t.setVisibility(View.VISIBLE);
 			}else{
 				l.setVisibility(View.VISIBLE);
 				t.setVisibility(View.GONE);
 			}
-			
-			if(items==null){
-				items = new ScheduleItemAdapter(result, StarredScheduleActivity.this, getApplicationContext());
-				l.setAdapter(items);
-			}else{
-				items.setItems(result);
-				items.notifyDataSetChanged();
+   			
+			if(result!=null){
+				if(items==null){
+					items = new ScheduleItemAdapter(result, StarredScheduleActivity.this, getApplicationContext());
+					l.setAdapter(items);
+				}else{
+					items.setItems(result);
+					items.notifyDataSetChanged();
+				}
 			}
 			
 			handler.postDelayed(new Runnable() {

@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import ws.munday.barcamptampa.R.anim;
 import ws.munday.barcamptampa.R.id;
 import ws.munday.barcamptampa.R.layout;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -58,21 +56,16 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 			
 			@Override
 			public void onClick(View v) {
-				new syncTask().execute();
+				new loadTask().execute();
 			}
 		});
 		
-		
-	}
-	
-	@Override
-	protected void onStart() {
 		ListView l = (ListView)findViewById(id.scheduleitems);
 		dbSyncer = new DatabaseSyncer(getApplicationContext());		
 	    dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
 		db = dbHelper.getWritableDatabase();
 		
-		new loadTask().execute();
+		//new loadTask().execute();
 		l.setOnItemClickListener( new OnItemClickListener() {
 
 			@Override
@@ -87,18 +80,22 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 			
 		});
 		
-		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.startAnimation(refreshAnim);
 		
 		SimpleDateFormat f = new SimpleDateFormat("h:mm a");
 		TextView title = (TextView)findViewById(id.title);
 		title.setText("Next @" + f.format(new Date(getNextTalkTime())));
 		
+	}
+	
+	@Override
+	protected void onStart() {
+		new loadTask().execute();
 		super.onStart();
 	}
 	
 	@Override
-	protected void onStop() {
+	protected void onDestroy() {
 		dbSyncer.close();
 		db.close();
 		dbHelper.close();
@@ -195,7 +192,25 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 
 	@Override
 	public boolean OnItemStarred(long id, boolean star) {
-		return starItem(id, star);
+		boolean s = starItem(id, star);
+		ListView l = (ListView)findViewById(R.id.scheduleitems);
+		TextView t = (TextView)findViewById(R.id.noitems);
+		ArrayList<ScheduleItem> itms = getItems();
+		if(items==null){
+			items = new ScheduleItemAdapter(itms, UpcomingScheduleActivity.this, getApplicationContext());
+			l.setAdapter(items);
+		}else{
+			items.setItems(itms);
+			items.notifyDataSetChanged();
+		}
+		if(itms==null || itms.isEmpty()){
+				l.setVisibility(View.GONE);
+				t.setVisibility(View.VISIBLE);
+			}else{
+				l.setVisibility(View.VISIBLE);
+				t.setVisibility(View.GONE);
+			}
+		return s;
 	}
 	
 	@Override
@@ -204,57 +219,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 		dbHelper.close();
 		super.finalize();
 	}
-	
-	class syncTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
-
-		final ImageView refresh = (ImageView) findViewById(id.refresh);
-		
- 		@Override
- 		public ArrayList<ScheduleItem> doInBackground(Void... params) {
- 			runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					refresh.startAnimation(refreshAnim);
-				}
-			});
- 			return getItems();
- 		}
-     	
- 		public void onPostExecute(ArrayList<ScheduleItem> result) {
- 			Log.d("bctb","sync done");
- 			TextView t = (TextView)findViewById(id.noitems);
- 			ListView l = (ListView)findViewById(id.scheduleitems);
- 			
- 			if(result.isEmpty()){
- 				l.setVisibility(View.GONE);
- 				t.setVisibility(View.VISIBLE);
- 			}else{
- 				l.setVisibility(View.VISIBLE);
- 				t.setVisibility(View.GONE);
- 			}
-		
-			if(items==null){
-				items = new ScheduleItemAdapter(result, UpcomingScheduleActivity.this, getApplicationContext());
-				l = (ListView)findViewById(id.scheduleitems);
-				l.setAdapter(items);
-			}else{
-				items.setItems(result);
-				items.notifyDataSetChanged();
-			}
-		
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					refresh.clearAnimation();
-				}
-			}, 600); 
-		
-			
-		}
- 		
-     };
-     
+	 
      class loadTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
 
    		final ImageView refresh = (ImageView) findViewById(id.refresh);
@@ -268,8 +233,11 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 	   						refresh.startAnimation(refreshAnim);
 	   					}
     			});
-    			
-    			return getItems();
+    			try{
+    				return getItems();
+    			}catch(Exception e){
+    				return null;
+    			}
     		}
         	
     		public void onPostExecute(ArrayList<ScheduleItem> result) {
@@ -277,7 +245,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
     			TextView t = (TextView)findViewById(id.noitems);
     			ListView l = (ListView)findViewById(id.scheduleitems);
      			
-     			if(result.isEmpty()){
+     			if(result!=null && result.isEmpty()){
      				l.setVisibility(View.GONE);
      				t.setVisibility(View.VISIBLE);
      			}else{
@@ -285,13 +253,15 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
      				t.setVisibility(View.GONE);
      			}
 				
-     			if(items==null){
-					items = new ScheduleItemAdapter(result, UpcomingScheduleActivity.this, getApplicationContext());
-					l.setAdapter(items);
-				}else{
-					items.setItems(result);
-					items.notifyDataSetChanged();
-				}
+     			if(result!=null){
+	     			if(items==null){
+						items = new ScheduleItemAdapter(result, UpcomingScheduleActivity.this, getApplicationContext());
+						l.setAdapter(items);
+					}else{
+						items.setItems(result);
+						items.notifyDataSetChanged();
+					}
+     			}
     			
    				handler.postDelayed(new Runnable() {
    					@Override

@@ -52,7 +52,7 @@ public class BarcampTampaActivity extends Activity {
         	createButtonGrid(R.id.main_menu,10, homeIcons);
         }else{
     		buildHomeIcons(10);
-    		createButtonGrid(R.id.main_menu,40, homeIcons);	
+    		createButtonGrid(R.id.main_menu,35, homeIcons);	
         }
     	
         Runnable tweetrefresher = new Runnable() {
@@ -70,11 +70,12 @@ public class BarcampTampaActivity extends Activity {
 	
 		dbSyncer = new DatabaseSyncer(getApplicationContext());		
 		
+		new syncTask().execute();
+    	
     }
 
     @Override
     protected void onStart() {
-    	new syncTask().execute();
     	super.onStart();
     }
     
@@ -92,8 +93,8 @@ public class BarcampTampaActivity extends Activity {
     		buildHomeIcons(5);
     		createButtonGrid(R.id.main_menu,10, homeIcons);
         }else{
-    		buildHomeIcons(10);
-    		createButtonGrid(R.id.main_menu,40, homeIcons);
+    		buildHomeIcons(5);
+    		createButtonGrid(R.id.main_menu,35, homeIcons);
         }
     	
     	super.onConfigurationChanged(newConfig);
@@ -270,7 +271,6 @@ public class BarcampTampaActivity extends Activity {
  				dbSyncer.syncData();
 			}catch (Exception e) {
 				e.printStackTrace();
-
 			}
 			return null;
  			

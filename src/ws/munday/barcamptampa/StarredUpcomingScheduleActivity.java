@@ -58,7 +58,7 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 			
 			@Override
 			public void onClick(View v) {
-				new syncTask().execute();
+				new loadTask().execute();
 			}
 		});
 		
@@ -66,16 +66,11 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 		TextView title = (TextView)findViewById(id.title);
 		title.setText("Starred @" + f.format(new Date(getNextTalkTime())));
 		
-		
-	}
-	
-	@Override
-	protected void onStart() {
 		dbHelper = new barcampDbHelper(getApplicationContext(), BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
 		db = dbHelper.getWritableDatabase();
 		dbSyncer = new DatabaseSyncer(this);
 		ListView l = (ListView)findViewById(id.scheduleitems);
-		new loadTask().execute();
+		//new loadTask().execute();
 		l.setOnItemClickListener( new OnItemClickListener() {
 
 			@Override
@@ -89,14 +84,18 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 			}
 			
 		});
-		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.startAnimation(refreshAnim);
 		
+	}
+	
+	@Override
+	protected void onStart() {
+		new loadTask().execute();
 		super.onStart();
 	}
 	
 	@Override
-	protected void onStop() {
+	protected void onDestroy() {
 		db.close();
 		dbHelper.close();
 		dbSyncer.close();
@@ -193,66 +192,26 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
 
 	@Override
 	public boolean OnItemStarred(long id, boolean star) {
-		return starItem(id, star);
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		db.close();
-		dbHelper.close();
-		super.finalize();
-	}
-	
-	class syncTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
-
-		final ImageView refresh = (ImageView) findViewById(id.refresh);
-		
- 		@Override
- 		public ArrayList<ScheduleItem> doInBackground(Void... params) {
- 			runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					refresh.startAnimation(refreshAnim);
-				}
-			});
- 			
- 			return getItems();
- 		}
-     	
- 		public void onPostExecute(ArrayList<ScheduleItem> result) {
- 			Log.d("bctb","sync done");
- 			TextView t = (TextView)findViewById(id.noitems);
- 			ListView l = (ListView)findViewById(id.scheduleitems);
- 			
- 			if(result.isEmpty()){
- 				l.setVisibility(View.GONE);
- 				t.setVisibility(View.VISIBLE);
- 			}else{
- 				l.setVisibility(View.VISIBLE);
- 				t.setVisibility(View.GONE);
- 			}
-		
-			if(items==null){
-				items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
-				l = (ListView)findViewById(id.scheduleitems);
-				l.setAdapter(items);
-			}else{
-				items.setItems(result);
-				items.notifyDataSetChanged();
-			}
-		
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					refresh.clearAnimation();
-				}
-			}, 600); 
-			
-			
+		boolean s = starItem(id, star);
+		ListView l = (ListView)findViewById(R.id.scheduleitems);
+		TextView t = (TextView)findViewById(R.id.noitems);
+		ArrayList<ScheduleItem> itms = getItems();
+		if(items==null){
+			items = new ScheduleItemAdapter(itms, StarredUpcomingScheduleActivity.this, getApplicationContext());
+			l.setAdapter(items);
+		}else{
+			items.setItems(itms);
+			items.notifyDataSetChanged();
 		}
- 		
-     };
+		if(itms==null || itms.isEmpty()){
+				l.setVisibility(View.GONE);
+				t.setVisibility(View.VISIBLE);
+			}else{
+				l.setVisibility(View.VISIBLE);
+				t.setVisibility(View.GONE);
+			}
+		return s;
+	}
      
      class loadTask extends UserTask<Void, Void, ArrayList<ScheduleItem>>{
 
@@ -269,8 +228,11 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
    				}
    			});
 
-    			
-    			return getItems();
+    			try{
+    				return getItems();
+    			}catch(Exception e){
+    				return null;
+    			}
     		}
         	
     		public void onPostExecute(ArrayList<ScheduleItem> result) {
@@ -278,22 +240,24 @@ public class StarredUpcomingScheduleActivity extends Activity implements StarChe
     			TextView t = (TextView)findViewById(id.noitems);
      			ListView l = (ListView)findViewById(id.scheduleitems);
      			
-     			if(result.isEmpty()){
+     			if(result!=null && result.isEmpty()){
      				l.setVisibility(View.GONE);
      				t.setVisibility(View.VISIBLE);
      			}else{
      				l.setVisibility(View.VISIBLE);
      				t.setVisibility(View.GONE);
      			}
+     			
+    			if(result!=null){
+	    			if(items==null){
+						items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
+						l.setAdapter(items);
+					}else{
+						items.setItems(result);
+						items.notifyDataSetChanged();
+					}
+    			}
     			
-    			if(items==null){
-					items = new ScheduleItemAdapter(result, StarredUpcomingScheduleActivity.this, getApplicationContext());
-					l.setAdapter(items);
-				}else{
-					items.setItems(result);
-					items.notifyDataSetChanged();
-				}
-			
    				handler.postDelayed(new Runnable() {
    					@Override
    					public void run() {

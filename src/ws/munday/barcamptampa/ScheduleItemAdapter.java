@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import ws.munday.barcamptampa.BarcampTampaContentProvider.barcampDbHelper;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class ScheduleItemAdapter extends BaseAdapter{
 		this.inflater = LayoutInflater.from(this.context);
 		this.items = items;
 		this.checkListener = l;
+		dbHelper = new barcampDbHelper(this.context, BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
+		
 	}
 
 	public ArrayList<ScheduleItem> getItems() {
@@ -131,7 +134,7 @@ public class ScheduleItemAdapter extends BaseAdapter{
 			holder.conflict.setVisibility(View.VISIBLE);
 			holder.conflict.setText("conflict - " + s.conflictingItems.size() + " other talk" + (s.conflictingItems.size()>1?"s":"") + " starred at " + f.format(s.startTime));
 		}else{
-			holder.conflict.setVisibility(View.GONE);
+			holder.conflict.setVisibility(View.INVISIBLE);
 		}
 		
 		return convertView;
@@ -154,7 +157,7 @@ public class ScheduleItemAdapter extends BaseAdapter{
 
 	public boolean isItemStarred(long id){
 		
-		dbHelper = new barcampDbHelper(this.context, BarcampTampaContentProvider.DATABASE_NAME, null, BarcampTampaContentProvider.DATABASE_VERSION);
+		try{
 		db = dbHelper.getWritableDatabase();
 		
 		String[] columns = {BarcampTampaContentProvider.SCHEDULE_ITEM_ID,
@@ -178,13 +181,14 @@ public class ScheduleItemAdapter extends BaseAdapter{
 					boolean val = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
 					c.close();
 					db.close();
-					dbHelper.close();
 					return val;
 				}else{
 					db.close();
-					dbHelper.close();
 					return false;
 				}
+		}catch(Exception e){
+			return false;
+		}
 			
 	}
 	

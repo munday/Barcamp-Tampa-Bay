@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 
-import android.util.Log;
+//import android.util.Log;
 
 
 public class CSVReader {
@@ -26,7 +26,7 @@ public class CSVReader {
 			ScheduleItem i = new ScheduleItem();
 			i.sheetId = getData(data,0);
 			i.startTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,2));
-			Log.d("bctb", i.startTime.toString());
+			//Log.d("bctb", i.startTime.toString());
 			i.endTime = new Date(DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + getData(data,3));
 			i.roomName = getData(data,4);
 			i.title = getData(data,5);

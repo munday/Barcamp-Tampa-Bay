@@ -31,14 +31,17 @@ public class DatabaseSyncer {
 		
 		ArrayList<ScheduleItem> schedule = CSVReader.getSchedule();
 		ArrayList<ScheduleItem> dbschedule = getDBSchedule();
-		
-		removeDeleted(schedule, dbschedule);
-		
-		for(ScheduleItem i:schedule){
-			upsertScheduleItem(i);
+		try{
+			db.beginTransaction();
+			removeDeleted(schedule, dbschedule);
+			for(ScheduleItem i:schedule){
+				upsertScheduleItem(i);
+			}
+			db.setTransactionSuccessful();
+		}catch(Exception e){ }
+		finally{
+			db.endTransaction();
 		}
-		
-		
 	}
 	
 	public void close(){
@@ -66,7 +69,7 @@ public class DatabaseSyncer {
 		v.put(BarcampTampaContentProvider.SLIDES_URL, i.slidesUrl);
 		
 		int updated = db.update(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, v, BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID + "=" + i.sheetId, null);
-		
+		Log.d("bctb","updated: " + i.sheetId + " = " + (updated==1));
 		if(updated == 0){
 			db.insert(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, "", v);
 		}
@@ -135,8 +138,9 @@ public class DatabaseSyncer {
 			}
 			
 			if(remove){
-				Log.d("bctb","delete:" + d.sheetId);
-				deleteItem(d);
+				boolean deleted = deleteItem(d);
+				Log.d("bctb","delete:" + d.sheetId + "=" + deleted);
+				
 			}
 		}
 	}

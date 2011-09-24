@@ -1,6 +1,7 @@
 package ws.munday.barcamptampa;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
@@ -47,6 +48,8 @@ public class ScheduleItemActivity extends Activity {
 		db = dbHelper.getWritableDatabase();
 	
 		refreshAnim = AnimationUtils.loadAnimation(getApplicationContext(),anim.rotate);
+		Intent i = getIntent();
+		itemId = i.getIntExtra("ITEM_ID", -1);
 		 
 		ImageView refresh = (ImageView) findViewById(id.refresh);
 		refresh.setOnClickListener(new View.OnClickListener() {
@@ -55,19 +58,18 @@ public class ScheduleItemActivity extends Activity {
 			public void onClick(View v) {
 				
 				new syncTask().execute();
-				
+				loadItem(itemId);			
+			
 			}
 		});
 		
-		Intent i = getIntent();
-		itemId = i.getIntExtra("ITEM_ID", -1);
+		loadItem(itemId);
 		
 		super.onCreate(savedInstanceState);
 	}
 	
 	@Override
 	protected void onStart() {
-		loadItem(itemId);
 		super.onStart();
 	}
 	
@@ -108,6 +110,10 @@ public class ScheduleItemActivity extends Activity {
 				
 			}
 		
+			SimpleDateFormat f = new SimpleDateFormat("h:mm a");
+			TextView roomAndTime = (TextView) findViewById(R.id.talk_room_and_time);
+			roomAndTime.setText("In " + i.roomName + " at " + f.format(i.startTime));
+			
 			TextView title = (TextView) findViewById(R.id.talk_title);
 			title.setText(i.title);
 			
@@ -169,6 +175,7 @@ public class ScheduleItemActivity extends Activity {
 			
 			ImageView slides = (ImageView) findViewById(R.id.slides_icon);
 			LinearLayout slides_wrap = (LinearLayout) findViewById(R.id.slides);
+			
 			if(i.slidesUrl.trim().length()<=0){
 				slides.setVisibility(View.GONE);
 				slides_wrap.setVisibility(View.GONE);
@@ -189,36 +196,46 @@ public class ScheduleItemActivity extends Activity {
 			}
 			
 			
-			
-			c = db.query(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, columns, 
-					BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID + "=" + id, null, null, null,BarcampTampaContentProvider.START_TIME);
-			
-			if(c!=null){
+			if(i.isStarred){
+				c = db.query(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, columns, 
+						BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID + " != " + i.sheetId + " AND " + BarcampTampaContentProvider.STARRED + "=1", null, null, null,BarcampTampaContentProvider.START_TIME);
 				
-				ScheduleItem itm = new ScheduleItem();
-				
-				while(c.moveToNext()){
+				if(c!=null){
 					
-						itm.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
-						itm.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
-						itm.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
-						itm.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
-						itm.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
-						itm.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
-						itm.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
-						itm.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);
-						itm.speakerTwitter = c.getString(BarcampTampaContentProvider.SPEAKER_TWITTER_COLUMN);
-						itm.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
-						itm.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
-						itm.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+					ScheduleItem itm = new ScheduleItem();
 					
-						if(!itm.sheetId.equals(i.sheetId) && itm.startTime.equals(itm)){
-							i.conflictingItems.add(itm);
-						}
+					while(c.moveToNext()){
+						
+							itm.id = c.getLong(BarcampTampaContentProvider.SCHEDULE_ITEM_ID_COLUMN);
+							itm.sheetId = c.getString(BarcampTampaContentProvider.SHEET_ID_COLUMN);
+							itm.roomName = c.getString(BarcampTampaContentProvider.ROOM_NAME_COLUMN);
+							itm.startTime = new Date(c.getLong(BarcampTampaContentProvider.START_TIME_COLUMN));
+							itm.endTime = new Date(c.getLong(BarcampTampaContentProvider.END_TIME_COLUMN));
+							itm.title = c.getString(BarcampTampaContentProvider.TITLE_COLUMN);
+							itm.description = c.getString(BarcampTampaContentProvider.DESCRIPTION_COLUMN);
+							itm.speaker = c.getString(BarcampTampaContentProvider.SPEAKER_COLUMN);
+							itm.speakerTwitter = c.getString(BarcampTampaContentProvider.SPEAKER_TWITTER_COLUMN);
+							itm.speakerWebsite = c.getString(BarcampTampaContentProvider.SPEAKER_URL_COLUMN);
+							itm.slidesUrl = c.getString(BarcampTampaContentProvider.SLIDES_URL_COLUMN);
+							itm.isStarred = c.getInt(BarcampTampaContentProvider.STARRED_COLUMN)==1;
+						
+							if(itm.startTime.equals(i.startTime)){
+								i.conflictingItems.add(itm);
+							}
+					}
+					
 				}
-
-				c.close();
 			}
+	
+			TextView conflict = (TextView)findViewById(R.id.conflict);
+			if(i.conflictingItems != null && i.conflictingItems.size()>0){
+				conflict.setVisibility(View.VISIBLE);
+				conflict.setText("conflict - " + i.conflictingItems.size() + " other talk" + (i.conflictingItems.size()>1?"s":"") + " starred at " + f.format(i.startTime));
+			}else{
+				conflict.setVisibility(View.GONE);
+			}
+			
+			c.close();
 			
 		}
 		
@@ -238,7 +255,7 @@ public class ScheduleItemActivity extends Activity {
 		v.put(BarcampTampaContentProvider.STARRED, star?1:0);
 		
 		int ret = db.update(BarcampTampaContentProvider.SCHEDULE_TABLE_NAME, v, BarcampTampaContentProvider.SCHEDULE_ITEM_SHEET_ID + "=" + id, null);
-		
+		loadItem(itemId);
 		return ret==0?false:true;
 	}
 	
@@ -268,7 +285,6 @@ public class ScheduleItemActivity extends Activity {
  		public void onPostExecute(Void result) {
  			Log.d("bctb","sync done");
  			
-			loadItem(itemId);
 			
 			handler.postDelayed(new Runnable() {
 				@Override

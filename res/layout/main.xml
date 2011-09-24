@@ -18,7 +18,7 @@
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:fadingEdge="vertical"
-		android:layout_gravity="center"
+		android:layout_gravity="top"
 		android:gravity="fill"
 		android:layout_weight="2"
 		android:background="@drawable/bg"
@@ -27,11 +27,9 @@
 		<LinearLayout 
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
-			android:layout_gravity="center_vertical"
-			android:gravity="center"
+			android:layout_gravity="top"
+			android:gravity="top"
 			android:orientation="vertical">
-			
-			
 			
 			<TableLayout 
 				android:id="@+id/main_menu"
