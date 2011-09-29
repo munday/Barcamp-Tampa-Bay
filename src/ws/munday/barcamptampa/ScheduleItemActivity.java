@@ -145,7 +145,7 @@ public class ScheduleItemActivity extends Activity {
 					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
 					shareIntent.setType("text/plain");
 					shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Barcamp Tampa Bay");
-					shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I'm attending " + i.title + " by " + i.speaker + " at #barcamptampabay");
+					shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I'm attending " + i.title + " by " + i.speaker + " at #barcamptampa");
 
 					 startActivity(Intent.createChooser(shareIntent, "Share Using..."));
 				}

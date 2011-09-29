@@ -35,7 +35,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 	private SQLiteDatabase db;
 	ScheduleItemAdapter items;
 	private Animation refreshAnim;
-	private final Date CONFERENCE_DATE = new Date("11/24/2011");
+	private final Date CONFERENCE_DATE = new Date("9/24/2011");
 	private Date today;
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -158,7 +158,7 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 		today = Calendar.getInstance().getTime();
 		long diff = CONFERENCE_DATE.getTime() - today.getTime();
 		long days = diff / (1000 * 60 * 60 * 24);
-		
+		Log.d("bctb","days: " + days);
 		if(days > 0){
 			//conference not started, show the unavailable message
 			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + "8:00 AM";		
@@ -170,12 +170,31 @@ public class UpcomingScheduleActivity extends Activity implements StarCheckListe
 			Calendar c = Calendar.getInstance();
 			int hour = c.get(Calendar.HOUR);
 			int amPm = c.get(Calendar.AM_PM);
-			int min = c.get(Calendar.MINUTE);
-			if(min>=0 && min <= 30){
-				min = 30;
-			}else if(min > 30){
-				min = 00;
+			
+			if(hour==0){
+				hour=12;
 			}
+			
+			if(c.get(Calendar.HOUR_OF_DAY) >= 11){
+				amPm = 1;
+			}
+			
+			int min = c.get(Calendar.MINUTE);
+			Log.d("bctb","hour:" + hour + " min:" + min + " " + amPm);
+			
+			if(min>=0 && min <= 40){
+				min = 30;
+			}else if(min > 40){
+				min = 00;
+				hour+=1;
+			}
+			
+			
+			if(hour>=13){
+				hour=hour-12;
+			}
+			
+			Log.d("bctb","hour:" + hour + " min:" + min + " " + amPm);
 			return DatabaseSyncer.CONFERENCE_DATE_WITHOUT_TIME + hour + ":" + (min<10?"0"+min:min) + " " + (amPm==1?"PM":"AM");
 			
 		}
